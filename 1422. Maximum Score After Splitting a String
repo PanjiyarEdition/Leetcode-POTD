@@ -1,43 +1,44 @@
-📍Description ➡:-
-image.png
 
-💡Constraints ➡:-
-2 <= s.length <= 500
-The string s consists of characters  
-′
- 0 
-′
-  and  
-′
- 1 
-′
-  only.
 
-📝Code Here ⬇:-
-public class Solution {
-    public int maxScore(String inputStr) {
-        int totalOnes = 0;
-        int zerosCount = 0;
+# 📍Description ➡:-
+<!-- Describe your first thoughts on how to solve this problem. -->
+IMAGE HERE
+
+
+
+
+# Code
+```cpp [C++]
+class Solution {
+public:
+    int maxScore(string inputStr) {
         int onesCount = 0;
-        int bestScore = Integer.MIN_VALUE;
+        int zerosCount = 0;
+        int bestScore = INT_MIN;
 
-        // Count total ones in the string
-        for (char ch : inputStr.toCharArray()) {
-            if (ch == '1') totalOnes++;
+        for (int i = 0; i < inputStr.size() - 1; i++) {
+            if (inputStr[i] == '1') {
+                onesCount++;
+            } else {
+                zerosCount++;
+            }
+            
+            bestScore = max(bestScore, zerosCount - onesCount);
         }
-
-        // Traverse the string and calculate scores
-        for (int i = 0; i < inputStr.length() - 1; i++) {
-            if (inputStr.charAt(i) == '0') zerosCount++;
-            else onesCount++;
-
-            // Calculate score
-            int currentScore = zerosCount + (totalOnes - onesCount);
-            bestScore = Math.max(bestScore, currentScore);
-
+        
+        if (inputStr[inputStr.size() - 1] == '1') {
+            onesCount++;
         }
-
-        return bestScore;
+        
+        return bestScore + onesCount;
     }
-}
-Coded By PanjiyarEDITION
+};
+```
+
+
+
+---
+
+>    **Coded** By $$Panjiyar EDITION$$
+
+               
