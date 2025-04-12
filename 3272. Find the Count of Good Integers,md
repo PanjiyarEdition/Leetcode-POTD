@@ -1,0 +1,221 @@
+# 📍Description ➡:-
+<!-- Describe your first thoughts on how to solve this problem. -->
+You are given `two positive` integers `n and k`.
+
+An `integer x` is called` k-palindromic` if:
+
+`x is a palindrome`.
+**`x is divisible by k`**.
+An integer is called good if its digits can be `rearranged` to form a `k-palindromic` integer. For example, for `k = 2`, `2020 `can be rearranged to form the `k-palindromic` `integer 2002`, whereas `1010` cannot be rearranged to form a `k-palindromic` integer.
+
+Return the count of good integers containing `n digits`.
+
+Note that any integer must not have leading zeros, `neither` before nor after `rearrangement`. For example, 1010 cannot be rearranged to form `101`.
+
+
+# 📝Code ⬇:-
+
+
+# Java
+```java []
+class Solution {
+    
+    // 🔢 A helper function to calculate factorial of a number (used for permutations)
+    public long factorial(int num) {
+        long result = 1;
+        for (int i = 1; i <= num; i++) {
+            result *= i;  // Multiply from 1 to num (like 1 * 2 * 3 * ... * num)
+        }
+        return result; // Return the final factorial value
+    }
+
+    // 🌀 This function recursively generates all palindromic numbers of length 'n'
+    public void generatePalindromes(char[] currentNumber, int index, List<String> validPalindromes, int k) {
+        // Base case: if we've filled the entire number from both ends
+        if (index >= (currentNumber.length + 1) / 2) {
+            String palindrome = new String(currentNumber); // Convert char[] to string
+            // ✅ Only keep this number if it's divisible by k
+            if (Long.parseLong(palindrome) % k == 0) {
+                validPalindromes.add(palindrome);
+            }
+            return;
+        }
+
+        // ⚠️ Try placing '0' at this index (but not in the first position)
+        if (index != 0) {
+            currentNumber[index] = '0';
+            currentNumber[currentNumber.length - 1 - index] = '0'; // Mirror placement
+            generatePalindromes(currentNumber, index + 1, validPalindromes, k); // Move to next index
+        }
+
+        // 🔁 Try placing digits from '1' to '9' at current index (mirrored on both sides)
+        for (char c = '1'; c <= '9'; c++) {
+            currentNumber[index] = c;
+            currentNumber[currentNumber.length - 1 - index] = c; // Mirror the digit
+            generatePalindromes(currentNumber, index + 1, validPalindromes, k); // Recurse deeper
+        }
+    }
+
+    // 🎯 This is the main function that returns the final answer
+    public long countGoodIntegers(int n, int k) {
+        List<String> validPalindromes = new ArrayList<>(); // Stores all valid palindromes
+        char[] basePalindrome = new char[n]; // Initial base: all zero characters
+        Arrays.fill(basePalindrome, '0'); // Fill it with '0's
+        generatePalindromes(basePalindrome, 0, validPalindromes, k); // Start building palindromes
+
+        Set<String> uniquePatterns = new HashSet<>(); // Store unique frequency patterns
+
+        // 🧮 For each valid palindrome, generate a "frequency pattern" string
+        for (String palindrome : validPalindromes) {
+            int[] freq = new int[10]; // Array to count digits 0 to 9
+            for (char ch : palindrome.toCharArray()) {
+                freq[ch - '0']++; // Increase count for digit
+            }
+
+            // 🧵 Convert frequency into a pattern string (like a hash)
+            StringBuilder pattern = new StringBuilder();
+            for (int f : freq) {
+                pattern.append((char) ('a' + f)); // Convert frequency number to a letter
+            }
+
+            uniquePatterns.add(pattern.toString()); // Add the pattern to the set (no duplicates)
+        }
+
+        long totalPermutations = factorial(n); // Total permutations of n digits
+        long totalValidPermutations = 0; // We'll accumulate the final answer here
+
+        // 🔍 For each unique digit pattern, calculate how many valid permutations it can make
+        for (String pattern : uniquePatterns) {
+            long permutations = totalPermutations;
+
+            // 🧩 Divide by factorials of repeated digits to handle duplicates (like permutations with repeated elements)
+            for (char ch : pattern.toCharArray()) {
+                permutations /= factorial(ch - 'a'); // Convert char back to count (reverse of earlier encoding)
+            }
+
+            // ⚠️ Remove permutations that start with 0 — they are not valid integers
+            if (pattern.charAt(0) != 'a') { // Means we have leading zeros
+                int zeroCount = pattern.charAt(0) - 'a' - 1; // Remove 1 zero from front
+                long invalidPerms = factorial(n - 1); // First digit can't be 0, fix it and permute rest
+
+                // 🔄 Again, remove duplicates due to repeated digits (excluding the leading zero)
+                for (int j = 1; j < pattern.length(); j++) {
+                    invalidPerms /= factorial(pattern.charAt(j) - 'a');
+                }
+
+                invalidPerms /= factorial(zeroCount); // Adjust for leading zero count
+                permutations -= invalidPerms; // Subtract invalid ones
+            }
+
+            totalValidPermutations += permutations; // Add valid permutations to total
+        }
+
+        return totalValidPermutations; // Return final answer
+    }
+}
+
+```
+
+# C++
+``` cpp []
+class Solution {
+public:
+    // 🔢 Chakra Resource Counter (Factorial)
+    long long factorial(int num) {
+        long long chakra = 1;
+        for (int i = 1; i <= num; i++) chakra *= i;
+        return chakra;
+    }
+
+    // 🌀 Shadow Clone Builder
+    void generatePalindromes(string& clone, int index, vector<string>& validClones, int k) {
+        if (index >= (clone.length() + 1) / 2) {
+            if (stoll(clone) % k == 0) validClones.push_back(clone);
+            return;
+        }
+
+        if (index != 0) {
+            clone[index] = '0';
+            clone[clone.size() - 1 - index] = '0';
+            generatePalindromes(clone, index + 1, validClones, k);
+        }
+
+        for (char c = '1'; c <= '9'; c++) {
+            clone[index] = c;
+            clone[clone.size() - 1 - index] = c;
+            generatePalindromes(clone, index + 1, validClones, k);
+        }
+    }
+
+    // 💥 Hidden Leaf’s Main Function
+    long long countGoodIntegers(int n, int k) {
+        vector<string> validClones;
+        string baseClone(n, '0');
+        generatePalindromes(baseClone, 0, validClones, k);
+
+        set<string> chakraPatterns;
+
+        // 🧠 Unique Frequency Fingerprint for each Clone
+        for (auto& clone : validClones) {
+            vector<int> freq(10, 0);
+            for (char c : clone) freq[c - '0']++;
+            string pattern;
+            for (int f : freq) pattern += (char)('a' + f);
+            chakraPatterns.insert(pattern);
+        }
+
+        long long basePerms = factorial(n);
+        long long total = 0;
+
+        for (auto& pattern : chakraPatterns) {
+            long long perms = basePerms;
+            for (char f : pattern) perms /= factorial(f - 'a');
+
+            if (pattern[0] != 'a') {
+                int zeros = pattern[0] - 'a' - 1;
+                long long zeroPerms = factorial(n - 1);
+                for (int j = 1; j < pattern.size(); j++) zeroPerms /= factorial(pattern[j] - 'a');
+                zeroPerms /= factorial(zeros);
+                perms -= zeroPerms;
+            }
+
+            total += perms;
+        }
+
+        return total;
+    }
+};
+```
+
+# Python
+``` python []
+class Solution:
+    def countGoodIntegers(self, n: int, k: int) -> int:
+
+        if n == 1: return 9//k
+        k_pals, ans = set(), 0
+
+        pals_left = product(*[digits[1:]]+[digits] *((n-1)//2)) # <-- 1
+       
+        for pal_left in pals_left:
+
+            pal_rght = pal_left[::-1][n%2:]                     # <-- 2
+            pal = ''.join(((*pal_left, *pal_rght)))
+
+            if int(pal)%k == 0:                                 # <-- 3
+                k_pals.add(''.join(sorted(pal)))
+
+        for k_pal in k_pals:
+
+            ctr = Counter(k_pal)                                # <-- 4
+            denom = reduce(mul, map(factorial, ctr.values()))
+            ans+= factorial(n)*(n - ctr['0'])//(denom * n)
+            
+        return ans     
+```
+
+---
+
+>    **Coded** By $$Panjiyar EDITION 🖋  $$
+
+               
